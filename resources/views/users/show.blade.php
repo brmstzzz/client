@@ -37,44 +37,71 @@
                                 @method('PUT')
                                 <div class="card-body">
                                     <div class="form-group">
-                                        <label for="exampleInputName">Nama <span class="text-danger">*</span></label>
+                                        <label for="inputName">Nama <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                            name="name" id="inputError" value="{{ $dt['name'] }}" required>
+                                            name="name" id="inputName" value="{{ old('name', $dt['name']) }}" required>
+                                        @error('name')
+                                            <span class="invalid-feedback">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                     <div class="form-group">
-                                        <label for="exampleInputEmail">Email <span class="text-danger">*</span></label>
+                                        <label for="inputEmail">Email <span class="text-danger">*</span></label>
                                         <input type="email" class="form-control @error('email') is-invalid @enderror"
-                                            name="email" id="inputError" value="{{ $dt['email'] }}" required>
+                                            name="email" id="inputEmail" value="{{ old('email', $dt['email']) }}" required>
+                                        @error('email')
+                                            <span class="invalid-feedback">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                     <div class="form-group">
-                                        <label for="exampleInputaddress">Alamat <span class="text-danger">*</span></label>
+                                        <label for="inputPassword">Password <small class="text-muted"></label>
+                                        <input type="password" class="form-control @error('password') is-invalid @enderror"
+                                            name="password" id="inputPassword" placeholder="Masukkan password baru">
+                                        @error('password')
+                                            <span class="invalid-feedback">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="inputAddress">Alamat <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('address') is-invalid @enderror"
-                                            name="address" id="inputError" value="{{ $dt['address'] }}" required>
+                                            name="address" id="inputAddress" value="{{ old('address', $dt['address']) }}" required>
+                                        @error('address')
+                                            <span class="invalid-feedback">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                     <div class="form-group">
-                                        <label for="exampleInputPhoneNumber">No. Hp. <span
+                                        <label for="inputPhoneNumber">No. Hp. <span
                                                 class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('phone_number') is-invalid @enderror"
-                                            name="phone_number" id="inputError" value="{{ $dt['phone_number'] }}" required>
+                                            name="phone_number" id="inputPhoneNumber" value="{{ old('phone_number', $dt['phone_number']) }}" required>
+                                        @error('phone_number')
+                                            <span class="invalid-feedback">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                     <div class="form-group">
-                                        <label for="exampleInputCity">Kota <span class="text-danger">*</span></label>
+                                        <label for="inputCity">Kota <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('city') is-invalid @enderror"
-                                            name="city" id="inputError" value="{{ $dt['city'] }}" required>
+                                            name="city" id="inputCity" value="{{ old('city', $dt['city']) }}" required>
+                                        @error('city')
+                                            <span class="invalid-feedback">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                     <div class="form-group">
-                                        <label for="exampleInputRoles">Roles <span class="text-danger">*</span></label>
-                                        <select class="custom-select" name="roles" required>
+                                        <label for="inputRoles">Roles <span class="text-danger">*</span></label>
+                                        <select class="custom-select @error('roles') is-invalid @enderror" name="roles" id="inputRoles" required>
                                             <option value="">Pilih</option>
-                                            <option value="1" {{ $dt['roles'] == 1 ? 'selected' : '' }}>Admin</option>
-                                            <option value="2" {{ $dt['roles'] == 2 ? 'selected' : '' }}>User</option>
+                                            <option value="1" {{ old('roles', $dt['roles']) == 1 ? 'selected' : '' }}>Admin</option>
+                                            <option value="2" {{ old('roles', $dt['roles']) == 2 ? 'selected' : '' }}>User</option>
                                         </select>
+                                        @error('roles')
+                                            <span class="invalid-feedback">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                 </div>
                                 <!-- /.card-body -->
 
                                 <div class="card-footer">
                                     <button type="submit" class="btn btn-primary">Submit</button>
+                                    <a href="{{ route('users.index') }}" class="btn btn-secondary">Kembali</a>
                                 </div>
                             </form>
                         </div>
@@ -89,4 +116,4 @@
         <!-- /.content -->
     </div>
 
-@endsection
+@endsection 

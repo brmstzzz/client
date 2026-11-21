@@ -14,9 +14,7 @@ class UserController extends Controller
     public function index(): View
     {
         $send_request = Http::get('http://localhost:8000/api/v1/users');
-
         $response = $send_request->json();
-
         $users = $response['data'] ?? [];
 
         return view('users.index', ['users' => $users]);
@@ -25,22 +23,20 @@ class UserController extends Controller
     // Menampilkan halaman tambah user
     public function create(): View
     {
-        $data = array();
-
-        return view('users.create', $data);
+        return view('users.create');
     }
 
     // Menyimpan user baru
     public function store(Request $request): RedirectResponse
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email',
-            'password' => 'required',
-            'address' => 'required',
+            'name'         => 'required|string|max:255',
+            'email'        => 'required|email',
+            'password'     => 'required|min:6',
+            'address'      => 'required',
             'phone_number' => 'required',
-            'city' => 'required',
-            'roles' => 'required',
+            'city'         => 'required',
+            'roles'        => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -50,13 +46,13 @@ class UserController extends Controller
         }
 
         $response = Http::post('http://localhost:8000/api/v1/users', [
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'password' => $request->input('password'),
-            'address' => $request->input('address'),
+            'name'         => $request->input('name'),
+            'email'        => $request->input('email'),
+            'password'     => $request->input('password'),
+            'address'      => $request->input('address'),
             'phone_number' => $request->input('phone_number'),
-            'city' => $request->input('city'),
-            'roles' => $request->input('roles'),
+            'city'         => $request->input('city'),
+            'roles'        => $request->input('roles'),
         ]);
 
         $responseData = $response->json();
@@ -65,42 +61,57 @@ class UserController extends Controller
             return redirect()->route('users.index')->with([
                 'success' => 'Data Berhasil Disimpan!'
             ]);
-        } else {
-            return redirect()->route('users.index')->with([
-                'error' => 'Data gagal Disimpan!'
-            ]);
         }
+
+        return redirect()->back()->withInput()->with([
+            'error' => $responseData['message'] ?? 'Data gagal Disimpan!'
+        ]);
     }
 
     // Menampilkan detail user
     public function show(string $id): View|RedirectResponse
     {
         $response = Http::get("http://localhost:8000/api/v1/users/{$id}");
-
         $responseData = $response->json();
 
         if ($response->successful() && ($responseData['success'] ?? false) === true) {
             $dt = $responseData['data'];
-
             return view('users.show', compact('dt'));
-        } else {
-            return redirect()->route('users.index')->with([
-                'error' => 'Data tidak ditemukan!'
-            ]);
         }
+
+        return redirect()->route('users.index')->with([
+            'error' => 'Data tidak ditemukan!'
+        ]);
+    }
+
+    // Menampilkan halaman edit user
+    public function edit(string $id): View|RedirectResponse
+    {
+        $response = Http::get("http://localhost:8000/api/v1/users/{$id}");
+        $responseData = $response->json();
+
+        if ($response->successful() && ($responseData['success'] ?? false) === true) {
+            $dt = $responseData['data'];
+            // Jika file edit kamu bernama users/edit.blade.php, ganti 'users.show' menjadi 'users.edit'
+            return view('users.show', compact('dt'));
+        }
+
+        return redirect()->route('users.index')->with([
+            'error' => 'Data tidak ditemukan!'
+        ]);
     }
 
     // Mengubah data user
-// Mengubah data user
     public function update(Request $request, $id): RedirectResponse
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email',
-            'address' => 'required',
+            'name'         => 'required|string|max:255',
+            'email'        => 'required|email',
+            'password'     => 'nullable|min:6',
+            'address'      => 'required',
             'phone_number' => 'required',
-            'city' => 'required',
-            'roles' => 'required',
+            'city'         => 'required',
+            'roles'        => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -110,12 +121,12 @@ class UserController extends Controller
         }
 
         $data = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'address' => $request->address,
+            'name'         => $request->name,
+            'email'        => $request->email,
+            'address'      => $request->address,
             'phone_number' => $request->phone_number,
-            'city' => $request->city,
-            'roles' => $request->roles,
+            'city'         => $request->city,
+            'roles'        => $request->roles,
         ];
 
         if ($request->filled('password')) {
@@ -133,16 +144,13 @@ class UserController extends Controller
             return redirect()->route('users.index')->with([
                 'success' => 'Data Berhasil Diubah!'
             ]);
-        } else {
-            // ---> PINDAHKAN DD() KE SINI (DI DALAM FUNGSI UPDATE) <---
-            dd($response->status(), $responseData, $response->body());
-
-            return redirect()->route('users.index')->with([
-                'error' => 'Data gagal Diubah!'
-            ]);
         }
+
+        return redirect()->back()->withInput()->with([
+            'error' => $responseData['message'] ?? 'Data gagal Diubah!'
+        ]);
     }
-    
+
     // Menghapus user
     public function destroy($id): RedirectResponse
     {
@@ -156,32 +164,10 @@ class UserController extends Controller
             return redirect()->route('users.index')->with([
                 'success' => 'Data Berhasil Dihapus!'
             ]);
-        } else {
-            return redirect()->route('users.index')->with([
-                'error' => 'Data tidak ditemukan!'
-            ]);
-        }
-    }
-
-
-    // Menampilkan halaman edit user
-    public function edit(string $id): View|RedirectResponse
-    {
-        $response = Http::get("http://localhost:8000/api/v1/users/{$id}");
-        $responseData = $response->json();
-
-        if ($response->successful() && ($responseData['success'] ?? false) === true) {
-            $dt = $responseData['data'];
-
-            return view('users.show', compact('dt'));
-        } else {
-            // TAMBAHKAN BARIS INI UNTUK MELIHAT PESAN ERROR DARI API
-            dd($response->status(), $responseData, $response->body());
         }
 
-
-        return redirect()->route('users.index')
-            ->with(['error' => 'Data tidak ditemukan!']);
+        return redirect()->route('users.index')->with([
+            'error' => 'Data tidak ditemukan!'
+        ]);
     }
-
 }
